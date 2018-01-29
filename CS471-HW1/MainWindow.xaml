@@ -1,0 +1,110 @@
+﻿<Window x:Class="CS471_HW1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CS471_HW1"
+        mc:Ignorable="d"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        Background="{DynamicResource MaterialDesignPaper}"
+        TextElement.FontWeight="Medium"
+        TextElement.FontSize="14"
+        FontFamily="pack://application:,,,/MaterialDesignThemes.Wpf;component/Resources/Roboto/#Roboto"
+        Title="MainWindow" Height="350" Width="525">
+    <materialDesign:DialogHost Identifier="RootDialog" SnackbarMessageQueue="{Binding ElementName=MainSnackbar, Path=MessageQueue}">
+        <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding ElementName=MenuToggleButton, Path=IsChecked}">
+            <materialDesign:DrawerHost.LeftDrawerContent>
+                <DockPanel MinWidth="212">
+                    <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
+                                    DockPanel.Dock="Top"
+                                    HorizontalAlignment="Right" Margin="16"
+                                    IsChecked="{Binding ElementName=MenuToggleButton, Path=IsChecked, Mode=TwoWay}" />
+                    <ListBox x:Name="DemoItemsListBox" Margin="0 16 0 16" SelectedIndex="0"                         
+                             ItemsSource="{Binding DemoItems}"
+                             PreviewMouseLeftButtonUp="UIElement_OnPreviewMouseLeftButtonUp">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="domain:DemoItem">
+                                <TextBlock Text="{Binding Name}" Margin="32 0 32 0" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </materialDesign:DrawerHost.LeftDrawerContent>
+            <DockPanel>
+                <materialDesign:ColorZone Padding="5" materialDesign:ShadowAssist.ShadowDepth="Depth2"
+                                            Mode="PrimaryMid" DockPanel.Dock="Top">
+                    <DockPanel>
+                        <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}" IsChecked="False"
+                                        x:Name="MenuToggleButton"/>
+                        <materialDesign:PopupBox DockPanel.Dock="Right" PlacementMode="BottomAndAlignRightEdges" StaysOpen="False">
+                            <StackPanel>
+                                <Button Content="Logout"/>
+                                <Button Content="Clear Cart"/>
+                                <Separator/>
+                                <Button Content="Exit" Click="MenuPopupButton_OnClick"/>
+                            </StackPanel>
+                        </materialDesign:PopupBox>
+
+                        <materialDesign:Badged DockPanel.Dock="Right" x:Name="CountingBadge" Margin="0 0 15 0" VerticalAlignment="Center" BadgeColorZoneMode="PrimaryDark" Badge="1" BadgePlacementMode="Right">
+                            <materialDesign:PopupBox PlacementMode="BottomAndAlignRightEdges" StaysOpen="True">
+                                <materialDesign:PopupBox.ToggleContent>
+                                    <materialDesign:PackIcon Kind="Cart" Width="24" Height="24" Margin="0 0 20 0" Foreground="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType=materialDesign:PopupBox}, Path=Foreground}"/>
+                                </materialDesign:PopupBox.ToggleContent>
+                                <Grid Width="200">
+                                    <StackPanel Orientation="Vertical">
+                                        <ItemsControl x:Name="CartItemsListBox" Margin="0 16 0 16"                       
+                                         ItemsSource="{Binding Source=CartItems}"
+                                         PreviewMouseLeftButtonUp="UIElement_OnPreviewMouseLeftButtonUp">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Height="25" Width="185">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*"/>
+                                                            <ColumnDefinition Width="25"/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                                            <TextBlock Text="{Binding Name}"/>
+                                                            <TextBlock Text="-"/>
+                                                            <TextBlock Text="{Binding Quantity}"/>
+                                                        </StackPanel>
+                                                        <Button Grid.Column="1" Style="{StaticResource MaterialDesignRaisedButton}" BorderBrush="#D50000" Background="#F44336" Height="20" Width="20" Padding="0">
+                                                            <materialDesign:PackIcon Kind="Delete" Foreground="White"/>
+                                                        </Button>
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                            
+                                        </ItemsControl>
+                                        <Separator/>
+                                        <StackPanel>
+                                            <Button Style="{StaticResource MaterialDesignRaisedAccentButton}" Margin="5" Content="Clear Cart"/>
+                                            <Button Style="{StaticResource MaterialDesignRaisedButton}" Margin="5" Content="Proceed to Checkout"/>
+                                        </StackPanel>
+                                        
+                                    </StackPanel>
+                                </Grid>
+                            </materialDesign:PopupBox>
+                        </materialDesign:Badged>
+
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="22">ChoMart</TextBlock>
+                    </DockPanel>
+                </materialDesign:ColorZone>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <ScrollViewer Grid.Row="1" 
+                                  HorizontalScrollBarVisibility="{Binding ElementName=DemoItemsListBox, Path=SelectedItem.HorizontalScrollBarVisibilityRequirement}"
+                                  VerticalScrollBarVisibility="{Binding ElementName=DemoItemsListBox, Path=SelectedItem.VerticalScrollBarVisibilityRequirement}" 
+                                  Padding="{Binding ElementName=DemoItemsListBox, Path=SelectedItem.MarginRequirement}">
+                        <ContentControl Content="{Binding ElementName=DemoItemsListBox, Path=SelectedItem.Content}" />
+                    </ScrollViewer>
+
+                    <materialDesign:Snackbar MessageQueue="{materialDesign:MessageQueue}" x:Name="MainSnackbar"
+                                            Grid.Row="1" />
+                </Grid>
+            </DockPanel>
+        </materialDesign:DrawerHost>
+    </materialDesign:DialogHost>
+</Window>
